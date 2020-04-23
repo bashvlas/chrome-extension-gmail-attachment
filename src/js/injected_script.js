@@ -1,86 +1,85 @@
+( function () {
 
-	( function () {
+	function wait ( time ) {
 
-		function wait ( time ) {
+		return new Promise( function ( resolve ) {
 
-			return new Promise( function ( resolve ) {
+			setTimeout( resolve, time );
 
-				setTimeout( resolve, time );
+		});
 
-			});
+	};
 
-		};
+	function change_default_create_element ( doc ) {
 
-		function change_default_create_element ( doc ) {
+		var old_create_element = doc.createElement;
 
-			var old_create_element = doc.createElement;
+		doc.createElement = function () {
 
-			doc.createElement = function () {
+			if (
+				should_replace_input_elements &&
+				arguments[ 0 ] === "input"
+			) {
 
-				if (
-					should_replace_input_elements &&
-					arguments[ 0 ] === "input"
-				) {
+				console.log( "attaching file" );
 
-					console.log( "attaching file" );
+				var result = doc.createElement( "div" );
 
-					var result = doc.createElement( "div" );
-
-					return result;
-
-				};
-
-				return old_create_element.apply( this, arguments );
+				return result;
 
 			};
 
-		};
-
-		function simulate_change_event_on_real_input ( input ) {
-
-			var event = document.createEvent( "HTMLEvents" );
-			event.initEvent( "change", false, true );
-			input.dispatchEvent( event );
+			return old_create_element.apply( this, arguments );
 
 		};
 
-		function simulate_change_event_on_fake_input ( fake_input_element ) {
+	};
 
-			var data_blob = new Blob( [ "example" ], { type: "text/plain" } );
+	function simulate_change_event_on_real_input ( input ) {
 
-			data_blob.lastModifiedDate = new Date();
-			data_blob.name = "example.txt";
+		var event = document.createEvent( "HTMLEvents" );
+		event.initEvent( "change", false, true );
+		input.dispatchEvent( event );
 
-			fake_input_element.files = [ data_blob ];
+	};
 
-			var event = document.createEvent( "HTMLEvents" );
-			event.initEvent( "change", false, true );
-			fake_input_element.dispatchEvent( event, { bubbles: true });
+	function simulate_change_event_on_fake_input ( fake_input_element ) {
 
-		};
+		var data_blob = new Blob( [ "example" ], { type: "text/plain" } );
 
-		async function attach_example_file () {
+		data_blob.lastModifiedDate = new Date();
+		data_blob.name = "example.txt";
 
-			change_default_create_element( document );
+		fake_input_element.files = [ data_blob ];
 
-			var attach_files_button = document.querySelector( "div.a1" );
+		var event = document.createEvent( "HTMLEvents" );
+		event.initEvent( "change", false, true );
+		fake_input_element.dispatchEvent( event, { bubbles: true });
 
-			var input = document.querySelector( "div.wG[ command = 'Files' ]+input" );
+	};
 
-			should_replace_input_elements = true;
+	async function attach_example_file () {
 
-			dispatch_change_event_on_real_input( input );
+		change_default_create_element( document );
 
-			await wait( 1000 );
+		var attach_files_button = document.querySelector( "div.a1" );
 
-			var fake_input_element = document.querySelector( "div.wG[ command = 'Files' ]+div" );
+		var input = document.querySelector( "div.wG[ command = 'Files' ]+input" );
 
-			should_replace_input_elements = false;
+		should_replace_input_elements = true;
 
-			dispatch_change_event_on_fake_input( fake_input_element );
+		dispatch_change_event_on_real_input( input );
 
-		};
+		await wait( 1000 );
 
-		attach_example_file();
+		var fake_input_element = document.querySelector( "div.wG[ command = 'Files' ]+div" );
 
-	} () );
+		should_replace_input_elements = false;
+
+		dispatch_change_event_on_fake_input( fake_input_element );
+
+	};
+
+	attach_example_file();
+
+} () );
