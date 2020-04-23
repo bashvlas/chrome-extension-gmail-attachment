@@ -1,0 +1,43 @@
+
+	{
+
+		"name": "Gmail Message Attachment Example",
+		"description": "This is an example of a chrome extension that attaches a file to a Gamil message.",
+
+		"version": "1.0.0",
+		"manifest_version": 2,
+		"author": "Vlas Bashynskyi",
+
+		"icons": {
+
+			"128": "/logo.png"
+
+		},
+
+		"browser_action": {
+
+			"default_icon": "/logo.png"
+
+		},
+
+		"background": {
+
+			"scripts": [
+
+				"/background.js"
+
+			],
+			"persistent": false
+
+		},
+
+		"permissions": [
+
+			"tabs",
+			"https://mail.google.com/mail/*"
+
+		],
+
+		"web_accessible_resources": [ "/*" ]
+
+	}
